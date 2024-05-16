@@ -140,6 +140,8 @@ module.exports = {
                 email: user.email,
             }, process.env.APP_JWT, { expiresIn: '1d' });
 
+            req.token = token;
+
             return res.status(200).json({
                 status: 200,
                 message: 'Sign in is successfully!',

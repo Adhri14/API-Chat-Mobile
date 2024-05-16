@@ -8,7 +8,8 @@ require('dotenv/config');
 const port = process.env.APP_PORT || 4000;
 
 const {
-    authRouter
+    authRouter,
+    userRouter
 } = require('./app/Routes');
 
 const app = express();
@@ -20,6 +21,7 @@ app.options('*', cors());
 
 // TODO API
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.APP_DATABASE, {

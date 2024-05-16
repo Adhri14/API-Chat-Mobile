@@ -1,4 +1,16 @@
-const { signUp, verificationEmail, sendEmailOtp, signIn, forgotPassword, verificationForgotPassword } = require('./auth');
+const {
+    signUp,
+    verificationEmail,
+    sendEmailOtp,
+    signIn,
+    forgotPassword,
+    verificationForgotPassword
+} = require('./auth');
+
+const {
+    getProfile,
+    updateProfile
+} = require('./user');
 
 module.exports = {
     signUp,
@@ -6,5 +18,7 @@ module.exports = {
     sendEmailOtp,
     signIn,
     forgotPassword,
-    verificationForgotPassword
+    verificationForgotPassword,
+    getProfile,
+    updateProfile
 }
