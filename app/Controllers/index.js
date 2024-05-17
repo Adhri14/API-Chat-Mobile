@@ -13,6 +13,13 @@ const {
     changePassword
 } = require('./user');
 
+const {
+    listChats,
+    sendChat,
+    updateStatusRead,
+    listMessage
+} = require('./chat')
+
 module.exports = {
     signUp,
     verificationEmail,
@@ -22,5 +29,9 @@ module.exports = {
     verificationForgotPassword,
     getProfile,
     updateProfile,
-    changePassword
+    changePassword,
+    listChats,
+    sendChat,
+    updateStatusRead,
+    listMessage
 }

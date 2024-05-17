@@ -9,7 +9,8 @@ const port = process.env.APP_PORT || 4000;
 
 const {
     authRouter,
-    userRouter
+    userRouter,
+    chatRouter
 } = require('./app/Routes');
 
 const app = express();
@@ -22,6 +23,7 @@ app.options('*', cors());
 // TODO API
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/chat', chatRouter);
 
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.APP_DATABASE, {
