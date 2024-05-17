@@ -9,7 +9,8 @@ const {
 
 const {
     getProfile,
-    updateProfile
+    updateProfile,
+    changePassword
 } = require('./user');
 
 module.exports = {
@@ -20,5 +21,6 @@ module.exports = {
     forgotPassword,
     verificationForgotPassword,
     getProfile,
-    updateProfile
+    updateProfile,
+    changePassword
 }

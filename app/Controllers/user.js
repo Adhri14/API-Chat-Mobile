@@ -1,6 +1,7 @@
 const userModel = require("../Models/User");
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
 
 const rootDir = path.resolve(__dirname, '../../');
 
@@ -83,6 +84,46 @@ module.exports = {
             return res.status(500).json({
                 status: 500,
                 message: error.message || 'Internal server error!'
+            });
+        }
+    },
+    changePassword: async (req, res) => {
+        try {
+            const { _id } = req.user;
+            const { oldPassword, newPassword, confirmPassword } = req.body;
+
+            const user = await userModel.findOne({ _id });
+
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found!'
+                });
+            }
+
+            if (!bcrypt.compareSync(oldPassword, user.password)) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Current Password doesn't match!"
+                });
+            }
+
+            if (newPassword !== confirmPassword) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "New Password doesn't match!"
+                });
+            }
+
+            await user.updateOne({ password: bcrypt.hashSync(newPassword, 10) });
+            return res.status(200).json({
+                status: 200,
+                message: 'Update password has been successfully!'
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                message: error.message || 'Internal server error',
             });
         }
     }
