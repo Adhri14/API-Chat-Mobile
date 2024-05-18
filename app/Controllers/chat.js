@@ -1,4 +1,4 @@
-const { findOne } = require("../Models/User");
+const { findOne } = require("../Models/user");
 const chatModel = require("../Models/chat");
 const chatMessageModel = require("../Models/chatMessage");
 
