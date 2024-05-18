@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Gemasting</title>
+    <link rel="shortcut icon" href="https://api.gemasting.com/storage/app/public/assets/photo/profile/icon.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+      
+        #otp-box {
+            margin: 5% auto;
+            width: 90%;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #otp-box img {
+            display: block;
+            margin: 0 auto 5%;
+
+        }
+
+        .otp-content {
+            text-align: center
+        }
+
+
+        .text-primary {
+            color: #EC4794;
+        }
+
+        .text-gray {
+            color: #999999;
+        }
+
+        .otp{
+            letter-spacing: 2vw;
+            text-align: center;
+            font-size: 3em;
+            font-weight: bold;
+        }
+        
+
+        .mb-2 {
+            margin-bottom: 2%;
+        }
+
+        .line {
+            height: 2px;
+            margin: 5% auto 3%;
+            background-color: #999999;
+        }
+      
+    </style>
+</head>
+<body>
+    <section id="otp-box">
+        <img src="https://api.gemasting.com/storage/app/public/assets/photo/profile/logo.png" >
+        <div class="otp-content">
+            <h2 class="mb-2">Kode Verifikasi</h2>
+            {{-- <h1 class="text-primary otp">2&nbsp;&nbsp;2&nbsp;&nbsp;3&nbsp;&nbsp;3</h1> --}}
+            <h1 class="text-primary otp"><%= otp %></h1>
+            <p>Segera lakukan verifikasi karena kode akan <br> kadaluarsa dalam 30 detik.</p>
+            <p class="text-primary">Jangan bagikan kode ini <br>
+                kepada siapapun!</p>
+        </div>
+        <div class="line"></div>
+        <div class="otp-footer text-gray">
+           <p>Dikirim oleh Adhri IT Tech</p>
+           <p>Mohon untuk tidak dibalas karena email ini <br>
+            dikirim oleh komputer</p>
+            <p class="text-primary">Bantuan - Kebijakan Privasi</p>
+        </div>
+    </section>
+</body>
+</html>
