@@ -1,5 +1,6 @@
 {
     "version": "0.0.1",
+    "buildCommand": "node index.js",
     "build": [
         {
             "src": "./index.js"
