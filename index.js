@@ -12,6 +12,7 @@ const {
     userRouter,
     chatRouter
 } = require('./app/Routes');
+const testingRouter = require('./app/Routes/testing');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(cors());
 app.options('*', cors());
 
 // TODO API
+app.use('/', testingRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
