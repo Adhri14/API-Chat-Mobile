@@ -1,19 +1,25 @@
-const admin = require('./adminFirebase');
-
-const sendNotification = async (deviceToken, data) => {
+require('dotenv').config();
+const sendNotification = async (deviceToken, notificationData = {}) => {
     try {
         const payload = {
+            to: deviceToken,
             notification: {
                 title: data.title,
                 body: data.body,
-                data: {
-                    ...data.data,
-                }
-            }
+            },
+            data: notificationData,
         }
 
-        const response = await admin.messaging().sendToDevice(deviceToken, payload);
-        console.log('Successfully sent message:', response);
+        const data = await fetch('https://fcm.googleapis.com/fcm/send', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `key=${process.env.FIREBASE_KEY}`,
+            },
+            body: payload
+        });
+        const response = await data.json();
+        console.log('Notification has been successfully!', response);
     } catch (error) {
         throw error;
     }
