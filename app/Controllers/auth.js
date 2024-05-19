@@ -58,7 +58,7 @@ module.exports = {
                 // responseError({ res, status: 403, message: 'Access denied!' });
                 return res.status(403).json({
                     status: 403,
-                    message: 'Access denied',
+                    message: 'Access denied, OTP not found!',
                 });
             }
 
@@ -67,7 +67,7 @@ module.exports = {
             if (findAuth.userId !== user._id.valueOf()) {
                 return res.status(403).json({
                     status: 403,
-                    message: 'Access denied',
+                    message: 'Access denied, user not found!',
                 });
             }
 
