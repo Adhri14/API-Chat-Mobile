@@ -12,9 +12,9 @@ const expiredAt = baseTime.getTime() + 60 * 1000;
 module.exports = {
     signUp: async (req, res) => {
         try {
-            const { fullName, username, email, password } = req.body;
+            const { fullName, username, email, password, deviceToken } = req.body;
 
-            const user = new userModel({ fullName, username, email, password });
+            const user = new userModel({ fullName, username, email, password, deviceToken });
             await user.save();
 
             const otp = generateOtp(6);

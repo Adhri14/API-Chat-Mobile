@@ -30,7 +30,7 @@ const UserSchema = new Schema({
         type: String,
         unique: true,
     },
-    device_token: {
+    deviceToken: {
         required: true,
         type: String,
     }
