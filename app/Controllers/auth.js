@@ -53,6 +53,7 @@ module.exports = {
             const { otp, email } = req.body;
 
             const findAuth = await otpModel.findOne({ otp, email });
+            console.log('cek : ', findAuth);
 
             if (!findAuth) {
                 // responseError({ res, status: 403, message: 'Access denied!' });
