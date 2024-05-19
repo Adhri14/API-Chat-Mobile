@@ -3,7 +3,7 @@ const generateOtp = require("../Utils/generateOtp");
 const otpModel = require("../Models/otp");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const sendEmailOTP = require("../Utils/sendEmailOTP");
+const sendNotification = require("../Utils/sendNotification");
 
 const response = { status: 200, message: '' };
 const baseTime = new Date();
@@ -25,6 +25,13 @@ module.exports = {
             //     otp: otpResult
             // }
             // await sendEmailOTP(user.email, "Verification Email", "otp", bodyEmail);
+
+            const payload = {
+                title: 'Econify Notification',
+                body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
+                data: {},
+            };
+            await sendNotification(user.device_token, payload);
 
             response.status = 201;
             response.message = 'Sign up has been successfully!. Please Login';
@@ -124,7 +131,7 @@ module.exports = {
     },
     signIn: async (req, res) => {
         try {
-            const { email, password } = req.body;
+            const { email, password, deviceToken } = req.body;
 
             const user = await userModel.findOne({ email });
             if (!user) {
@@ -147,6 +154,8 @@ module.exports = {
                     message: 'Sorry password is wrong, please try again!',
                 });
             }
+
+            await user.updateOne({ device_token: deviceToken });
 
             const token = jwt.sign({
                 user_id: user._id,

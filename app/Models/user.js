@@ -29,6 +29,10 @@ const UserSchema = new Schema({
         required: true,
         type: String,
         unique: true,
+    },
+    device_token: {
+        required: true,
+        type: String,
     }
 }, { timestamps: true });
 
