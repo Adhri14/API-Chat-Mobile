@@ -7,7 +7,7 @@ const sendNotification = require("../Utils/sendNotification");
 
 const response = { status: 200, message: '' };
 const baseTime = new Date();
-const expiredAt = baseTime.getTime() + 60 * 1000;
+const expiredAt = baseTime.getTime() + 2 * 60 * 1000;
 
 module.exports = {
     signUp: async (req, res) => {
@@ -110,11 +110,12 @@ module.exports = {
             const otp = generateOtp(6);
             const otpResult = await otpModel.create({ otp, expiredAt, email: user.email, userId: user._id });
 
-            // const bodyEmail = {
-            //     name: user.fullName,
-            //     otp: otpResult
-            // }
-            // await sendEmailOTP(user.email, "Verification Email", "otp", bodyEmail);
+            const payload = {
+                title: 'Econify Notification',
+                body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
+                data: {},
+            };
+            await sendNotification(user.deviceToken, payload);
 
             response.status = 201;
             response.message = 'OTP has been send in email!';
