@@ -31,7 +31,7 @@ module.exports = {
                 body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
                 data: {},
             };
-            await sendNotification(user.device_token, payload);
+            await sendNotification(user.deviceToken, payload);
 
             response.status = 201;
             response.message = 'Sign up has been successfully!. Please Login';
@@ -41,6 +41,7 @@ module.exports = {
                 data: otpResult.otp,
             });
         } catch (error) {
+            console.log(error);
             return res.status(500).json({
                 status: 500,
                 message: error.message || 'Internal server error'
@@ -155,7 +156,7 @@ module.exports = {
                 });
             }
 
-            await user.updateOne({ device_token: deviceToken });
+            await user.updateOne({ deviceToken });
 
             const token = jwt.sign({
                 user_id: user._id,
