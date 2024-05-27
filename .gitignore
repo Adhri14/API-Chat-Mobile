@@ -1,9 +1,9 @@
 node_modules/
 .env
-public/uploads/*.jpg
-public/uploads/*.png
-public/uploads/*.jpeg
-public/uploads/*.svg
-public/uploads/*.webp
+# public/uploads/*.jpg
+# public/uploads/*.png
+# public/uploads/*.jpeg
+# public/uploads/*.svg
+# public/uploads/*.webp
 .vercel
 serviceAccount.json
