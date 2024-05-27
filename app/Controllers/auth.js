@@ -31,7 +31,7 @@ module.exports = {
                 body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
                 data: {},
             };
-            await sendNotification(user.deviceToken, payload);
+            sendNotification(user.deviceToken, payload);
 
             response.status = 201;
             response.message = 'Sign up has been successfully!. Please Login';
@@ -117,7 +117,7 @@ module.exports = {
                 body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
                 data: {},
             };
-            await sendNotification(user.deviceToken, payload);
+            sendNotification(user.deviceToken, payload);
 
             response.status = 201;
             response.message = 'OTP has been send in email!';

@@ -22,7 +22,7 @@ module.exports = {
     },
     updateProfile: async (req, res) => {
         try {
-            const { fullName, username } = req.body;
+            const { fullName, username, bio } = req.body;
             const { _id } = req.user;
 
             let updateUser;
@@ -61,7 +61,7 @@ module.exports = {
                         fs.unlinkSync(current_image);
                     }
 
-                    updateUser = await userModel.findOneAndUpdate({ _id: user._id }, { image: filename, fullName, username });
+                    updateUser = await userModel.findOneAndUpdate({ _id: user._id }, { image: filename, fullName, username, bio });
 
                     req.user = updateUser;
                     return res.status(200).json({
@@ -76,7 +76,7 @@ module.exports = {
                 return;
             }
 
-            updateUser = await userModel.findOneAndUpdate({ _id: user._id }, { fullName, username });
+            updateUser = await userModel.findOneAndUpdate({ _id: user._id }, { fullName, username, bio });
 
             delete updateUser._doc.password;
             req.user = updateUser;
