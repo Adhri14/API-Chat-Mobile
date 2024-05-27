@@ -34,6 +34,7 @@ mongoose.connect(process.env.APP_DATABASE, {
 }).then(() => {
     console.log('Database is ready!');
 }).catch(err => {
+    console.log(err);
     console.log('Database error!');
 });
 
