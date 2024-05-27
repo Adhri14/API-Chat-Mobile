@@ -21,6 +21,8 @@ const UserSchema = new Schema({
         type: String,
         default: null,
     },
+    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     emailVerifiedAt: {
         type: Date,
         default: null,
