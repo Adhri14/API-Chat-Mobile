@@ -42,13 +42,7 @@ module.exports = {
                 ];
                 let filename = req.file.filename + "." + originalExt;
 
-                let target_path;
-                if (!fs.existsSync(`${rootDir}/public/uploads`)) {
-                    fs.mkdirSync(`${rootDir}/public/uploads`, { recursive: true });
-                    target_path = path.resolve(rootDir, `public/uploads/${filename}`);
-                } else {
-                    target_path = path.resolve(rootDir, `public/uploads/${filename}`);
-                }
+                let target_path = path.resolve(rootDir, `public/uploads/${filename}`);
 
                 const src = fs.createReadStream(temp_path);
                 const dest = fs.createWriteStream(target_path);
