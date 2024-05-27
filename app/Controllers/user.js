@@ -35,6 +35,8 @@ module.exports = {
                 });
             }
 
+            console.log(req.file);
+
             if (req.file) {
                 const temp_path = req.file.path;
                 const originalExt = req.file.originalname.split(".")[
