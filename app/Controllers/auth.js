@@ -183,9 +183,32 @@ module.exports = {
     },
     forgotPassword: async (req, res) => {
         try {
-            const { email, password, confirmPassword } = req.body;
+            const { email, password, confirmPassword, otp } = req.body;
 
+            const findAuth = await otpModel.findOne({ otp, email });
             const user = await userModel.findOne({ email });
+
+            if (!findAuth) {
+                // responseError({ res, status: 403, message: 'Access denied!' });
+                return res.status(403).json({
+                    status: 403,
+                    message: 'Access denied',
+                });
+            }
+
+            if (findAuth.userId !== user._id.valueOf()) {
+                return res.status(403).json({
+                    status: 403,
+                    message: 'Access denied',
+                });
+            }
+
+            if (findAuth.expiredAt < baseTime) {
+                return res.status(403).json({
+                    status: 403,
+                    message: 'OTP expired!',
+                });
+            }
 
             if (!user) {
                 return res.status(404).json({
