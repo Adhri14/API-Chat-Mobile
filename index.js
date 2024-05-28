@@ -15,8 +15,6 @@ if (ROLE_ENV === 'production') {
     require('dotenv/config');
 }
 
-const port = process.env.APP_PORT || 4000;
-
 const {
     authRouter,
     userRouter,
@@ -48,8 +46,9 @@ mongoose.connect(process.env.APP_DATABASE, {
     console.log('Database error!');
 });
 
-const server = app.listen(port, async () => {
-    console.log('Server is running on port : ', port);
+const server = app.listen(process.env.APP_PORT, async () => {
+    const port = server.address().port;
+    console.log(`Express is working on port ${port}`);
 });
 
 realtimeChat(server);
