@@ -48,7 +48,8 @@ module.exports = {
 
                 if (process.env.ENV === 'production') {
                     console.log('masuk kondisi production');
-                    target_path = path.resolve(rootDir, `tmp/uploads/${filename}`)
+                    // target_path = path.resolve(rootDir, `tmp/uploads/${filename}`)
+                    target_path = path.resolve(rootDir, `public/uploads/${filename}`)
                 } else {
                     target_path = path.resolve(rootDir, `public/uploads/${filename}`)
                 }
