@@ -4,7 +4,16 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const realtimeChat = require('./realtimeChat');
-require('dotenv/config');
+
+const ROLE_ENV = 'production';
+
+if (ROLE_ENV === 'production') {
+    let config = require('dotenv');
+    config.config({ path: './config/config.env' });
+} else {
+    require('dotenv/config');
+}
+
 const port = process.env.APP_PORT || 4000;
 
 const {
