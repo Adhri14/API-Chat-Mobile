@@ -46,7 +46,7 @@ mongoose.connect(process.env.APP_DATABASE, {
     console.log('Database error!');
 });
 
-const server = app.listen(process.env.APP_PORT, async () => {
+const server = app.listen(process.env.APP_PORT, "0.0.0.0", () => {
     const port = server.address().port;
     console.log(`Express is working on port ${port}`);
 });
