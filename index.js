@@ -10,6 +10,7 @@ const ROLE_ENV = 'production';
 if (ROLE_ENV === 'production') {
     let config = require('dotenv');
     config.config({ path: './config/config.env' });
+    console.log('masuk role production')
 } else {
     require('dotenv/config');
 }
