@@ -47,11 +47,11 @@ module.exports = {
                 let target_path;
 
                 if (process.env.ENV === 'production') {
-                    path.resolve(rootDir, `tmp/uploads/${filename}`)
+                    console.log('masuk kondisi production');
+                    target_path = path.resolve(rootDir, `tmp/uploads/${filename}`)
                 } else {
-                    path.resolve(rootDir, `public/uploads/${filename}`)
+                    target_path = path.resolve(rootDir, `public/uploads/${filename}`)
                 }
-
                 const src = fs.createReadStream(temp_path);
                 const dest = fs.createWriteStream(target_path);
 
