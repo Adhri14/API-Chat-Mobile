@@ -1,7 +1,8 @@
 const router = require('express').Router();
 
 router.get('/', (req, res) => {
-    res.status(200).json({
+    console.log('masuk route /');
+    return res.status(200).json({
         message: 'API Mobile Chat App',
     });
 });
