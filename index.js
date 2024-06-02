@@ -4,8 +4,9 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const realtimeChat = require('./realtimeChat');
+const path = require('path');
 
-const ROLE_ENV = 'production';
+const ROLE_ENV = 'local';
 
 if (ROLE_ENV === 'production') {
     let config = require('dotenv');
@@ -23,6 +24,8 @@ const {
 const testingRouter = require('./app/Routes/testing');
 
 const app = express();
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(bodyParser.json());
 app.use(morgan('tiny'));

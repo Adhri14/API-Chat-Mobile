@@ -10,7 +10,10 @@ const {
 const {
     getProfile,
     updateProfile,
-    changePassword
+    changePassword,
+    getListUsers,
+    getProfileById,
+    followProfile,
 } = require('./user');
 
 const {
@@ -33,5 +36,8 @@ module.exports = {
     listChats,
     sendChat,
     updateStatusRead,
-    listMessage
+    listMessage,
+    getListUsers,
+    getProfileById,
+    followProfile,
 }

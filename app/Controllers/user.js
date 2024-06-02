@@ -2,6 +2,8 @@ const userModel = require("../Models/user");
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
+const { Schema, Types } = require("mongoose");
+const sendNotification = require("../Utils/sendNotification");
 
 const rootDir = path.resolve(__dirname, '../../');
 
@@ -131,6 +133,102 @@ module.exports = {
                 status: 200,
                 message: 'Update password has been successfully!'
             });
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                message: error.message || 'Internal server error',
+            });
+        }
+    },
+    getListUsers: async (req, res) => {
+        try {
+            const { _id } = req.user;
+            const users = await userModel.find({ emailVerifiedAt: { $type: 'date', $ne: null }, _id: { $ne: new Types.ObjectId(_id) } });
+            return res.status(200).json({
+                status: 200,
+                message: 'Get users successfully',
+                data: users,
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                message: error.message || 'Internal server error',
+            });
+        }
+    },
+    getProfileById: async (req, res) => {
+        try {
+            const { userId } = req.params;
+            const user = await userModel.findOne({ _id: userId });
+
+            if (!user) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'User not found',
+                });
+            }
+
+            delete user._doc.password;
+            delete user._doc.device_token;
+            return res.status(200).json({
+                status: 200,
+                message: 'Get user by id successfully',
+                data: user,
+            })
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                message: error.message || 'Internal server error',
+            });
+        }
+    },
+    followProfile: async (req, res) => {
+        try {
+            const { _id } = req.user;
+            const { userId } = req.params;
+            const userFollow = await userModel.findOne({ _id });
+            const userFollowing = await userModel.findOne({ _id: userId });
+
+            console.log(_id, userId);
+
+            if (!userFollowing.followers.length && !userFollow.following.length) {
+                console.log('masuk sini');
+                await userFollow.updateOne({ following: [...userFollow.following, userFollowing._id] });
+                await userFollowing.updateOne({ followers: [...userFollow.followers, userFollow._id] });
+
+                const payload = {
+                    title: 'Econify Notification',
+                    body: `${userFollow.fullName} mengikuti anda`,
+                    data: {},
+                };
+                sendNotification(userFollowing.deviceToken, payload);
+                return res.status(200).json({
+                    status: 200,
+                    message: 'User is following',
+                });
+            }
+
+            const following = userFollow._doc.following.filter(item => item.valueOf() !== userId.toString());
+            const followers = userFollowing._doc.followers.filter(item => item.valueOf() !== _id.valueOf());
+            await userFollow.updateOne({ following });
+            await userFollowing.updateOne({ followers });
+
+            const payload = {
+                title: 'Econify Notification',
+                body: `${userFollow.fullName} berhenti mengikuti anda`,
+                data: {},
+            };
+            sendNotification(userFollowing.deviceToken, payload);
+
+            return res.status(200).json({
+                status: 200,
+                message: 'User is following',
+                // data: {
+                //     following,
+                //     followers,
+                // }
+            });
+
         } catch (error) {
             return res.status(500).json({
                 status: 500,
