@@ -13,18 +13,6 @@ const sendNotification = (deviceToken, notificationData = {}) => {
         "data": notificationData.data,
         "priority": "high",
     }
-
-    console.log(payload);
-
-    console.log('============= Send notification ===============')
-    // const data = await fetch('https://fcm.googleapis.com/fcm/send', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         'Authorization': `key=${process.env.FIREBASE_KEY}`,
-    //     },
-    //     body: payload
-    // });
     axios.post('https://fcm.googleapis.com/fcm/send', payload, {
         headers: {
             'Content-Type': 'application/json',
