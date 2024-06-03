@@ -142,8 +142,12 @@ module.exports = {
     },
     getListUsers: async (req, res) => {
         try {
+            const { search = '' } = req.query;
             const { _id } = req.user;
-            const users = await userModel.find({ emailVerifiedAt: { $type: 'date', $ne: null }, _id: { $ne: new Types.ObjectId(_id) } });
+            const users = await userModel.find({
+                $or: [{ fullName: search }, { username: search }],
+                emailVerifiedAt: { $type: 'date', $ne: null }, _id: { $ne: new Types.ObjectId(_id) }
+            });
             return res.status(200).json({
                 status: 200,
                 message: 'Get users successfully',
