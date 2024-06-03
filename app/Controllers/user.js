@@ -153,10 +153,12 @@ module.exports = {
                     ],
                     emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
                 });
+            } else {
+                users = await userModel.find({
+                    emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
+                });
             }
-            users = await userModel.find({
-                emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
-            });
+
             return res.status(200).json({
                 status: 200,
                 message: 'Get users successfully',
