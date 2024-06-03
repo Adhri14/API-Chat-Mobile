@@ -147,12 +147,15 @@ module.exports = {
             let users = [];
             if (search !== '') {
                 users = await userModel.find({
-                    $or: [{ fullName: search }, { username: search }],
-                    emailVerifiedAt: { $type: 'date', $ne: null }, _id: { $ne: new Types.ObjectId(_id) }
+                    "$or": [
+                        { fullName: { "$regex": search, $options: "i" } },
+                        { username: { "$regex": search, $options: "i" } }
+                    ],
+                    emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
                 });
             }
             users = await userModel.find({
-                emailVerifiedAt: { $type: 'date', $ne: null }, _id: { $ne: new Types.ObjectId(_id) }
+                emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
             });
             return res.status(200).json({
                 status: 200,
