@@ -144,8 +144,14 @@ module.exports = {
         try {
             const { search = '' } = req.query;
             const { _id } = req.user;
-            const users = await userModel.find({
-                $or: [{ fullName: search }, { username: search }],
+            let users = [];
+            if (search !== '') {
+                users = await userModel.find({
+                    $or: [{ fullName: search }, { username: search }],
+                    emailVerifiedAt: { $type: 'date', $ne: null }, _id: { $ne: new Types.ObjectId(_id) }
+                });
+            }
+            users = await userModel.find({
                 emailVerifiedAt: { $type: 'date', $ne: null }, _id: { $ne: new Types.ObjectId(_id) }
             });
             return res.status(200).json({
