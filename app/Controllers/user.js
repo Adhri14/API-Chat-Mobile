@@ -142,27 +142,45 @@ module.exports = {
     },
     getListUsers: async (req, res) => {
         try {
-            const { search = '' } = req.query;
+            const { search = '', offset = 0, limit = 10 } = req.query;
             const { _id } = req.user;
+
+            const page = Math.max(0, offset);
             let users = [];
+
             if (search !== '') {
-                users = await userModel.find({
-                    "$or": [
-                        { fullName: { "$regex": search, $options: "i" } },
-                        { username: { "$regex": search, $options: "i" } }
-                    ],
-                    emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
-                });
+                users = await userModel
+                    .find({
+                        "$or": [
+                            { fullName: { "$regex": search, $options: "i" } },
+                            { username: { "$regex": search, $options: "i" } }
+                        ],
+                        emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
+                    })
+                    .sort({ updatedAt: -1 })
+                    .skip(page * limit);
             } else {
-                users = await userModel.find({
+                users = await userModel
+                    .find({
+                        emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
+                    })
+                    .sort({ updatedAt: -1 })
+                    .skip(page * limit);
+            }
+
+            const users2 = await userModel
+                .find({
                     emailVerifiedAt: { "$type": 'date', "$ne": null }, _id: { "$ne": new Types.ObjectId(_id) }
                 });
-            }
 
             return res.status(200).json({
                 status: 200,
                 message: 'Get users successfully',
                 data: users,
+                pagination: {
+                    total: users2.length,
+                    totalPages: Math.ceil(users2.length / limit),
+                }
             });
         } catch (error) {
             return res.status(500).json({
