@@ -240,6 +240,37 @@ module.exports = {
                     message: 'User is following',
                 });
             }
+            if (userFollowing.followers.length > 0 && !userFollow.following.length) {
+                await userFollow.updateOne({ following: [...userFollow.following, userFollowing._id] });
+                // await userFollowing.updateOne({ followers: [...userFollow.followers, userFollow._id] });
+
+                const payload = {
+                    title: 'Econify Notification',
+                    body: `${userFollow.fullName} mengikuti anda`,
+                    data: {},
+                };
+                sendNotification(userFollowing.deviceToken, payload);
+                return res.status(200).json({
+                    status: 200,
+                    message: 'User is following',
+                });
+            }
+
+            if (!userFollowing.followers.length && userFollow.following.length) {
+                // await userFollow.updateOne({ following: [...userFollow.following, userFollowing._id] });
+                await userFollowing.updateOne({ followers: [...userFollow.followers, userFollow._id] });
+
+                const payload = {
+                    title: 'Econify Notification',
+                    body: `${userFollow.fullName} mengikuti anda`,
+                    data: {},
+                };
+                sendNotification(userFollowing.deviceToken, payload);
+                return res.status(200).json({
+                    status: 200,
+                    message: 'User is following',
+                });
+            }
 
             const following = userFollow._doc.following.filter(item => item.valueOf() !== userId.toString());
             const followers = userFollowing._doc.followers.filter(item => item.valueOf() !== _id.valueOf());
