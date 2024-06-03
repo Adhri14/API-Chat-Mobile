@@ -137,7 +137,7 @@ module.exports = {
         try {
             const { email, password, deviceToken } = req.body;
 
-            const user = await userModel.findOne({ email });
+            const user = await userModel.findOne({ $or: [{ email }, { username: email }] });
             if (!user) {
                 return res.status(404).json({
                     status: 404,
