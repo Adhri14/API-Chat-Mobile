@@ -272,26 +272,26 @@ module.exports = {
                 });
             }
 
-            const following = userFollow._doc.following.filter(item => item.valueOf() !== userId.toString());
-            const followers = userFollowing._doc.followers.filter(item => item.valueOf() !== _id.valueOf());
-            await userFollow.updateOne({ following });
-            await userFollowing.updateOne({ followers });
+            // const following = userFollow._doc.following.filter(item => item.valueOf() !== userId.toString());
+            // const followers = userFollowing._doc.followers.filter(item => item.valueOf() !== _id.valueOf());
+            // await userFollow.updateOne({ following });
+            // await userFollowing.updateOne({ followers });
 
-            const payload = {
-                title: 'Econify Notification',
-                body: `${userFollow.fullName} berhenti mengikuti anda`,
-                data: {},
-            };
-            sendNotification(userFollowing.deviceToken, payload);
+            // const payload = {
+            //     title: 'Econify Notification',
+            //     body: `${userFollow.fullName} berhenti mengikuti anda`,
+            //     data: {},
+            // };
+            // sendNotification(userFollowing.deviceToken, payload);
 
-            return res.status(200).json({
-                status: 200,
-                message: 'User is following',
-                // data: {
-                //     following,
-                //     followers,
-                // }
-            });
+            // return res.status(200).json({
+            //     status: 200,
+            //     message: 'User is following',
+            //     // data: {
+            //     //     following,
+            //     //     followers,
+            //     // }
+            // });
 
         } catch (error) {
             return res.status(500).json({
