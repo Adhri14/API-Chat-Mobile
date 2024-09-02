@@ -14,6 +14,7 @@ const {
     getListUsers,
     getProfileById,
     followProfile,
+    unfollowProfile,
 } = require('./user');
 
 const {
@@ -40,4 +41,5 @@ module.exports = {
     getListUsers,
     getProfileById,
     followProfile,
+    unfollowProfile,
 }

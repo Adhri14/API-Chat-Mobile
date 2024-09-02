@@ -1,4 +1,4 @@
-const { getProfile, updateProfile, changePassword, getListUsers, getProfileById, followProfile } = require('../Controllers');
+const { getProfile, updateProfile, changePassword, getListUsers, getProfileById, followProfile, unfollowProfile } = require('../Controllers');
 const authMiddleware = require('../Middleware/auth');
 const multer = require('multer');
 const os = require('os');
@@ -11,5 +11,6 @@ router.get('/:userId', [authMiddleware], getProfileById);
 router.post('/update-profile', [authMiddleware, multer({ dest: os.tmpdir() }).single('image')], updateProfile);
 router.post('/update-password', [authMiddleware], changePassword);
 router.post('/follow/:userId', [authMiddleware], followProfile);
+router.post('/unfollow/:userId', [authMiddleware], unfollowProfile);
 
 module.exports = router;

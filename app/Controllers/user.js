@@ -4,6 +4,9 @@ const fs = require('fs');
 const bcrypt = require('bcrypt');
 const { Schema, Types } = require("mongoose");
 const sendNotification = require("../Utils/sendNotification");
+const uploadFileS3 = require("../Utils/uploadFile");
+const { default: axios } = require("axios");
+const uploadFile = require("../Utils/uploadFileCloudinary");
 
 const rootDir = path.resolve(__dirname, '../../');
 
@@ -37,48 +40,30 @@ module.exports = {
                 });
             }
 
-            console.log(req.file);
+            let resultUpload;
 
             if (req.file) {
                 const temp_path = req.file.path;
-                const originalExt = req.file.originalname.split(".")[
-                    req.file.originalname.split(".").length - 1
-                ];
-                let filename = req.file.filename + "." + originalExt;
+                const result = await uploadFile(temp_path);
+                resultUpload = {
+                    width: result.width,
+                    height: result.height,
+                    format: result.format,
+                    resource_type: result.resource_type,
+                    created_at: result.created_at,
+                    bytes: result.bytes,
+                    type: result.type,
+                    url: result.secure_url,
+                };
+                updateUser = await userModel.findOneAndUpdate({ _id: user._id }, { image: JSON.stringify(resultUpload), fullName, username, bio });
+                delete updateUser._doc.password;
+                req.user = updateUser;
 
-                let target_path;
-
-                if (process.env.ENV === 'production') {
-                    console.log('masuk kondisi production');
-                    // target_path = path.resolve(rootDir, `tmp/uploads/${filename}`)
-                    target_path = path.resolve(rootDir, `public/uploads/${filename}`)
-                } else {
-                    target_path = path.resolve(rootDir, `public/uploads/${filename}`)
-                }
-                const src = fs.createReadStream(temp_path);
-                const dest = fs.createWriteStream(target_path);
-
-                src.pipe(dest);
-                src.on('end', async () => {
-                    const current_image = `${rootDir}public/uploads/${user.image}`;
-
-                    if (fs.existsSync(current_image)) {
-                        fs.unlinkSync(current_image);
-                    }
-
-                    updateUser = await userModel.findOneAndUpdate({ _id: user._id }, { image: filename, fullName, username, bio });
-
-                    req.user = updateUser;
-                    return res.status(200).json({
-                        status: 200,
-                        message: 'Update profile successfully!',
-                        data: updateUser
-                    });
-                });
-                src.on('error', () => {
-                    next();
-                });
-                return;
+                return res.status(200).json({
+                    status: 200,
+                    message: 'Update profile successfully!',
+                    data: updateUser
+                })
             }
 
             updateUser = await userModel.findOneAndUpdate({ _id: user._id }, { fullName, username, bio });
@@ -217,87 +202,45 @@ module.exports = {
     },
     followProfile: async (req, res) => {
         try {
-            const { _id } = req.user;
-            const { userId } = req.params;
-            const userFollow = await userModel.findOne({ _id });
-            const userFollowing = await userModel.findOne({ _id: userId });
+            const { _id: userId } = req.user;
+            const { userId: targetUserId } = req.params;
+            // Menambahkan targetUserId ke dalam daftar following dari userId
+            await userModel.findByIdAndUpdate(userId, {
+                $addToSet: { following: targetUserId }
+            });
 
-            console.log(_id, userId);
+            // Menambahkan userId ke dalam daftar followers dari targetUserId
+            await userModel.findByIdAndUpdate(targetUserId, {
+                $addToSet: { followers: userId }
+            });
 
-            if (!userFollowing.followers.length && !userFollow.following.length) {
-                console.log('masuk sini');
-                await userFollow.updateOne({ following: [...userFollow.following, userFollowing._id] });
-                await userFollowing.updateOne({ followers: [...userFollow.followers, userFollow._id] });
-
-                const payload = {
-                    title: 'Econify Notification',
-                    body: `${userFollow.fullName} mengikuti anda`,
-                    data: {},
-                };
-                sendNotification(userFollowing.deviceToken, payload);
-                return res.status(200).json({
-                    status: 200,
-                    message: 'User is following',
-                });
-            }
-            if (userFollowing.followers.length > 0 && !userFollow.following.length) {
-                await userFollow.updateOne({ following: [...userFollow.following, userFollowing._id] });
-                // await userFollowing.updateOne({ followers: [...userFollow.followers, userFollow._id] });
-
-                const payload = {
-                    title: 'Econify Notification',
-                    body: `${userFollow.fullName} mengikuti anda`,
-                    data: {},
-                };
-                sendNotification(userFollowing.deviceToken, payload);
-                return res.status(200).json({
-                    status: 200,
-                    message: 'User is following',
-                });
-            }
-
-            if (!userFollowing.followers.length && userFollow.following.length) {
-                // await userFollow.updateOne({ following: [...userFollow.following, userFollowing._id] });
-                await userFollowing.updateOne({ followers: [...userFollow.followers, userFollow._id] });
-
-                const payload = {
-                    title: 'Econify Notification',
-                    body: `${userFollow.fullName} mengikuti anda`,
-                    data: {},
-                };
-                sendNotification(userFollowing.deviceToken, payload);
-                return res.status(200).json({
-                    status: 200,
-                    message: 'User is following',
-                });
-            }
-
-            // const following = userFollow._doc.following.filter(item => item.valueOf() !== userId.toString());
-            // const followers = userFollowing._doc.followers.filter(item => item.valueOf() !== _id.valueOf());
-            // await userFollow.updateOne({ following });
-            // await userFollowing.updateOne({ followers });
-
-            // const payload = {
-            //     title: 'Econify Notification',
-            //     body: `${userFollow.fullName} berhenti mengikuti anda`,
-            //     data: {},
-            // };
-            // sendNotification(userFollowing.deviceToken, payload);
-
-            // return res.status(200).json({
-            //     status: 200,
-            //     message: 'User is following',
-            //     // data: {
-            //     //     following,
-            //     //     followers,
-            //     // }
-            // });
+            return res.status(200).json({ status: 200, message: 'User is Following' });
 
         } catch (error) {
             return res.status(500).json({
                 status: 500,
                 message: error.message || 'Internal server error',
             });
+        }
+    },
+    unfollowProfile: async (req, res) => {
+        try {
+            const { _id: userId } = req.user; // ID pengguna yang melakukan unfollow
+            const { userId: targetUserId } = req.params; // ID pengguna yang akan diunfollow
+
+            // Menghapus targetUserId dari daftar following dari userId
+            await userModel.findByIdAndUpdate(userId, {
+                $pull: { following: targetUserId }
+            });
+
+            // Menghapus userId dari daftar followers dari targetUserId
+            await userModel.findByIdAndUpdate(targetUserId, {
+                $pull: { followers: userId }
+            });
+
+            res.status(200).json({ message: 'Berhenti mengikuti pengguna' });
+        } catch (error) {
+            res.status(500).json({ error: 'Gagal berhenti mengikuti pengguna' });
         }
     }
 }
