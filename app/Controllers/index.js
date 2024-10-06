@@ -22,7 +22,11 @@ const {
     sendChat,
     updateStatusRead,
     listMessage
-} = require('./chat')
+} = require('./chat');
+
+const {
+    register: registerDevice
+} = require("./deviceinfo");
 
 module.exports = {
     signUp,
@@ -42,4 +46,5 @@ module.exports = {
     getProfileById,
     followProfile,
     unfollowProfile,
+    registerDevice
 }

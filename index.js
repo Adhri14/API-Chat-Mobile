@@ -19,7 +19,8 @@ if (ROLE_ENV === 'production') {
 const {
     authRouter,
     userRouter,
-    chatRouter
+    chatRouter,
+    deviceInfoRouter
 } = require('./app/Routes');
 const testingRouter = require('./app/Routes/testing');
 
@@ -37,6 +38,7 @@ app.use('/', testingRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/device_info', deviceInfoRouter);
 
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.APP_DATABASE, {

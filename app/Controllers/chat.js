@@ -1,6 +1,48 @@
-const { findOne } = require("../Models/user");
 const chatModel = require("../Models/chat");
 const chatMessageModel = require("../Models/chatMessage");
+const pusherRealtime = require("../Utils/pusherRealtime");
+
+const KEY_CHAT = "conversation-chats-";
+const KEY_MESSAGE = "conversation-messages-";
+
+const getMessage = async (data) => {
+    try {
+        const chats = await chatMessageModel.findOne({ _id: data._id })
+            .populate('sender', '_id fullName image')
+            .populate('receiver', '_id fullName image');
+
+        return chats;
+    } catch (error) {
+        throw error;
+    }
+}
+
+const getMessages = async (data) => {
+    try {
+        const offset = 0;
+        const limit = 10;
+
+        const page = Math.max(0, offset);
+
+        const chats = await chatModel.find({ participants: data._id })
+            .populate('participants', '_id fullName username email image')
+            .sort({ updatedAt: -1 })
+            .limit(limit)
+            .skip(page * limit);
+
+        const newChats = await Promise.all(chats.map(async (chat) => {
+            const messages = await chatMessageModel.find({ statusRead: false, chat: chat._id });
+            return {
+                ...chat.toObject(),
+                totalStatusChatUnRead: messages.length,
+            }
+        }));
+
+        return newChats;
+    } catch (error) {
+        throw error
+    }
+}
 
 module.exports = {
     listChats: async (req, res) => {
@@ -25,8 +67,6 @@ module.exports = {
                 }
             }));
 
-            console.log('new : ', newChats);
-
             return res.status(200).json({
                 status: 200,
                 message: 'Get list message successfully!',
@@ -49,8 +89,6 @@ module.exports = {
             const { _id } = req.user;
 
             let chats = [];
-
-            console.log('cek chat id : ', _id);
 
             if (!chatId) {
                 const chat = await chatModel.findOne({
@@ -104,16 +142,30 @@ module.exports = {
                 });
                 await newChat.save();
 
-                const chatMessage = new chatMessageModel({
+                const chatMessage = await chatMessageModel.create({
                     chat: newChat._id,
                     sender: _id,
                     receiver,
                     message,
                     replayUser,
                 });
-                await chatMessage.save();
-
                 await newChat.updateOne({ lastMessage: chatMessage.message });
+
+                const chats = await getMessage({ "_id": newChat._id });
+
+                if (chats) {
+                    pusherRealtime.trigger(`${KEY_CHAT}-channel-${newChat._id}`, `${KEY_CHAT}-event-${newChat._id}`, {
+                        data: chats
+                    });
+                }
+
+                const messages = await getMessages({ _id });
+                if (messages) {
+                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
+                        data: messages
+                    });
+                }
+
                 return res.status(200).json({
                     status: 200,
                     message: 'Send message is successfully!',
@@ -130,17 +182,29 @@ module.exports = {
                     }
                 });
 
-                const chatMessage = new chatMessageModel({
+                const chatMessage = await chatMessageModel.create({
                     chat: chat._id,
                     sender: _id,
                     receiver,
                     message,
                     replayUser,
                 });
-
-                await chatMessage.save();
-
                 await chat.updateOne({ lastMessage: chatMessage.message });
+
+                const chats = await getMessage({ "_id": chat._id });
+
+                if (chats) {
+                    pusherRealtime.trigger(`${KEY_CHAT}-channel-${chat._id}`, `${KEY_CHAT}-event-${chat._id}`, {
+                        data: chats
+                    });
+                }
+
+                const messages = await getMessages({ _id });
+                if (messages) {
+                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
+                        data: messages
+                    });
+                }
 
                 return res.status(200).json({
                     status: 200,
@@ -153,17 +217,29 @@ module.exports = {
 
             const chat = await chatModel.findOne({ _id: chatId });
 
-            const chatMessage = new chatMessageModel({
+            const chatMessage = await chatMessageModel.create({
                 chat: chat._id,
                 sender: _id,
                 receiver,
                 message,
                 replayUser,
             });
-
-            await chatMessage.save();
-
             await chat.updateOne({ lastMessage: chatMessage.message });
+
+            const chats = await getMessage({ "_id": chatMessage._id });
+
+            if (chats) {
+                pusherRealtime.trigger(`${KEY_CHAT}-channel-${chat._id}`, `${KEY_CHAT}-event-${chat._id}`, {
+                    data: chats
+                });
+            }
+
+            const messages = await getMessages({ _id });
+            if (messages) {
+                pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
+                    data: messages
+                });
+            }
 
             return res.status(200).json({
                 status: 200,
@@ -195,5 +271,5 @@ module.exports = {
                 message: error.message || 'Internal server error!',
             });
         }
-    }
+    },
 }
