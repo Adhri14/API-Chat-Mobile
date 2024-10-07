@@ -85,8 +85,10 @@ module.exports = {
     },
     listMessage: async (req, res) => {
         try {
-            const { userId: userIdTarget, chatId } = req.query;
+            const { userId: userIdTarget, chatId, offset = 0, limit = 10 } = req.query;
             const { _id } = req.user;
+
+            const page = Math.max(0, offset);
 
             let chats = [];
 
@@ -101,33 +103,47 @@ module.exports = {
                     chats = await chatMessageModel.find({ chat: chat._id })
                         .populate('sender', '_id fullName image')
                         .populate('receiver', '_id fullName image')
-                        .sort({ createdAt: -1 });
+                        .sort({ createdAt: -1 })
+                        .limit(limit)
+                        .skip(page * limit);
                 }
 
-                console.log('cek no id chat : ', chats);
+                const chats2 = await chatMessageModel.find({ chat: chat._id });
 
                 return res.status(200).json({
                     status: 200,
                     message: 'Get messages successfully',
-                    data: chats
+                    data: chats,
+                    pagination: {
+                        total: chats2.length,
+                        totalPages: Math.ceil(chats2.length / limit),
+                    }
                 });
             }
 
             chats = await chatMessageModel.find({ chat: chatId })
                 .populate('sender', '_id fullName image')
                 .populate('receiver', '_id fullName image')
-                .sort({ createdAt: -1 });
+                .sort({ createdAt: -1 })
+                .limit(limit)
+                .skip(page * limit);
+
+            const chats2 = await chatMessageModel.find({ chat: chatId });
 
             return res.status(200).json({
                 status: 200,
                 message: 'Get messages successfully',
-                data: chats
+                data: chats,
+                pagination: {
+                    total: chats2.length,
+                    totalPages: Math.ceil(chats2.length / limit),
+                }
             });
         } catch (error) {
-            console.log(error);
             return res.status(500).json({
                 status: 500,
                 message: error.message || 'Internal server error!',
+                data: []
             });
         }
     },
@@ -161,7 +177,7 @@ module.exports = {
 
                 const messages = await getMessages({ _id });
                 if (messages) {
-                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
+                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
                         data: messages
                     });
                 }
@@ -201,7 +217,7 @@ module.exports = {
 
                 const messages = await getMessages({ _id });
                 if (messages) {
-                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
+                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
                         data: messages
                     });
                 }
@@ -236,7 +252,7 @@ module.exports = {
 
             const messages = await getMessages({ _id });
             if (messages) {
-                pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
+                pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
                     data: messages
                 });
             }
@@ -258,8 +274,16 @@ module.exports = {
     },
     updateStatusRead: async (req, res) => {
         try {
+            const { _id } = req.user;
             const { chatId } = req.params;
             await chatMessageModel.updateMany({ chat: chatId, statusRead: false }, { statusRead: true });
+
+            const messages = await getMessages({ _id });
+            if (messages) {
+                pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
+                    data: messages
+                });
+            }
 
             return res.status(200).json({
                 status: 200,
