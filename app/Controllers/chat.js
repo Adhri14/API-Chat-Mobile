@@ -276,7 +276,9 @@ module.exports = {
         try {
             const { _id } = req.user;
             const { chatId } = req.params;
-            await chatMessageModel.updateMany({ chat: chatId, statusRead: false }, { statusRead: true });
+            const data = await chatMessageModel.updateMany({ chat: chatId, statusRead: false }, { statusRead: true });
+
+            console.log(data);
 
             const messages = await getMessages({ _id });
             if (messages) {
@@ -284,6 +286,10 @@ module.exports = {
                     data: messages
                 });
             }
+
+            pusherRealtime.trigger(`${KEY_CHAT}-channel-${chatId}`, `${KEY_CHAT}-event-${chatId}`, {
+                data: null
+            });
 
             return res.status(200).json({
                 status: 200,
