@@ -149,7 +149,7 @@ module.exports = {
     },
     sendChat: async (req, res) => {
         try {
-            const { message, receiver, replayUser = null, chatId, category } = req.body;
+            const { message, receiver, replayUser = null, chatId, category, meta } = req.body;
             const { _id } = req.user;
 
             if (!chatId && category === 'new') {
@@ -164,6 +164,7 @@ module.exports = {
                     receiver,
                     message,
                     replayUser,
+                    meta
                 });
                 await newChat.updateOne({ lastMessage: chatMessage.message });
 
@@ -204,6 +205,7 @@ module.exports = {
                     receiver,
                     message,
                     replayUser,
+                    meta
                 });
                 await chat.updateOne({ lastMessage: chatMessage.message });
 
@@ -239,6 +241,7 @@ module.exports = {
                 receiver,
                 message,
                 replayUser,
+                meta
             });
             await chat.updateOne({ lastMessage: chatMessage.message });
 

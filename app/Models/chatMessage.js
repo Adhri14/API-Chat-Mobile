@@ -7,7 +7,7 @@ const ChatMessageSchema = new Schema({
         required: true
     },
     meta: {
-        type: String,
+        type: Schema.Types.Mixed,
         default: null
     },
     sender: {
@@ -34,7 +34,7 @@ const ChatMessageSchema = new Schema({
         required: true,
     },
     media: {
-        type: String,
+        type: Schema.Types.Mixed,
         default: null,
     }
 }, { timestamps: true });
