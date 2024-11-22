@@ -4,7 +4,8 @@ const {
     sendEmailOtp,
     signIn,
     forgotPassword,
-    verificationForgotPassword
+    verificationForgotPassword,
+    signInGoogle
 } = require('./auth');
 
 const {
@@ -33,6 +34,7 @@ module.exports = {
     verificationEmail,
     sendEmailOtp,
     signIn,
+    signInGoogle,
     forgotPassword,
     verificationForgotPassword,
     getProfile,

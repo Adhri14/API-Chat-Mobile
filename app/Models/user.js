@@ -8,9 +8,7 @@ const UserSchema = new Schema({
         type: String,
     },
     username: {
-        required: true,
         type: String,
-        unique: true,
     },
     bio: {
         type: String,
@@ -31,13 +29,18 @@ const UserSchema = new Schema({
         default: null,
     },
     password: {
-        required: true,
         type: String,
-        unique: true,
     },
     deviceToken: {
         required: true,
         type: String,
+    },
+    typeLogin: {
+        required: true,
+        type: String
+    },
+    accessToken: {
+        type: String
     }
 }, { timestamps: true });
 
@@ -51,10 +54,10 @@ UserSchema.path('email').validate(async function (value) {
     }
 });
 
-UserSchema.pre('save', function (next) {
-    this.password = bcrypt.hashSync(this.password, HASH_ROUND);
-    next();
-});
+// UserSchema.pre('save', function (next) {
+//     this.password = bcrypt.hashSync(this.password, HASH_ROUND);
+//     next();
+// });
 
 const userModel = model('User', UserSchema);
 module.exports = userModel;

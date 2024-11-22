@@ -13,8 +13,28 @@ module.exports = {
     signUp: async (req, res) => {
         try {
             const { fullName, username, email, password, deviceToken } = req.body;
+            console.log('cek body : ', req.body);
 
-            const user = new userModel({ fullName, username, email, password, deviceToken });
+            if (!fullName || !username || !email || !password || !deviceToken) {
+                console.log('masuk sini kah?');
+                return res.status(400).json({
+                    status: 400,
+                    message: 'Bad request'
+                });
+            }
+
+            const checkUserExist = await userModel.findOne({ email });
+
+            if (checkUserExist) {
+                return res.status(403).json({
+                    status: 403,
+                    message: 'User already exist, please log in!'
+                });
+            }
+
+            const newPassword = bcrypt.hashSync(password, 10);
+
+            const user = new userModel({ fullName, username, email, password: newPassword, deviceToken, typeLogin: 'email-and-password' });
             await user.save();
 
             const otp = generateOtp(6);
@@ -138,6 +158,7 @@ module.exports = {
             const { email, password, deviceToken } = req.body;
 
             const user = await userModel.findOne({ $or: [{ email }, { username: email }] });
+            console.log('cek : ', user);
             if (!user) {
                 return res.status(404).json({
                     status: 404,
@@ -159,6 +180,13 @@ module.exports = {
                 });
             }
 
+            if (user && user.typeLogin !== 'email-and-password') {
+                return res.status(400).json({
+                    status: 400,
+                    message: 'Sorry this user is log in to social auth!',
+                });
+            }
+
             await user.updateOne({ deviceToken });
 
             const token = jwt.sign({
@@ -175,6 +203,7 @@ module.exports = {
             });
 
         } catch (error) {
+            console.log(error);
             return res.status(500).json({
                 status: 500,
                 message: error.message || 'Internal server error'
@@ -280,4 +309,63 @@ module.exports = {
             });
         }
     },
+    signInGoogle: async (req, res) => {
+        try {
+            const { email, fullName, deviceToken, accessToken, typeLogin } = req.body;
+
+            if (!fullName || !email || !deviceToken || !accessToken) {
+                return res.status(400).json({
+                    status: 400,
+                    message: 'Bad request'
+                });
+            }
+
+            const user = await userModel.findOne({ email, typeLogin: 'google-signin' });
+            if (!user) {
+                console.log('masuk sini nggk?');
+                const newUser = new userModel({ fullName, email, deviceToken, typeLogin: 'google-signin', accessToken, emailVerifiedAt: new Date() });
+                await newUser.save();
+                const token = jwt.sign({
+                    user_id: newUser._id,
+                    email: newUser.email,
+                }, process.env.APP_JWT, { expiresIn: '1d' });
+
+                req.token = token;
+                return res.status(200).json({
+                    status: 200,
+                    message: 'Sign in is successfully!',
+                    data: token
+                });
+            }
+
+            if (user && user.typeLogin !== 'google-signin') {
+                return res.status(400).json({
+                    status: 400,
+                    message: 'Sorry this user is log in to email and password!',
+                });
+            }
+
+            await user.updateOne({ deviceToken, accessToken });
+
+            const token = jwt.sign({
+                user_id: user._id,
+                email: user.email,
+            }, process.env.APP_JWT, { expiresIn: '1d' });
+
+            req.token = token;
+
+            return res.status(200).json({
+                status: 200,
+                message: 'Sign in is successfully!',
+                data: token
+            });
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                status: 500,
+                message: error.message || 'Internal server error'
+            });
+        }
+    }
 }
