@@ -29,6 +29,10 @@ const {
     register: registerDevice
 } = require("./deviceinfo");
 
+const {
+    uploadMedia
+} = require("./media");
+
 module.exports = {
     signUp,
     verificationEmail,
@@ -48,5 +52,6 @@ module.exports = {
     getProfileById,
     followProfile,
     unfollowProfile,
-    registerDevice
+    registerDevice,
+    uploadMedia,
 }

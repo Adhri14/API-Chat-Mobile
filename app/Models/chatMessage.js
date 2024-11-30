@@ -31,7 +31,6 @@ const ChatMessageSchema = new Schema({
     },
     message: {
         type: String,
-        required: true,
     },
     media: {
         type: Schema.Types.Mixed,

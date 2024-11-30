@@ -149,7 +149,7 @@ module.exports = {
     },
     sendChat: async (req, res) => {
         try {
-            const { message, receiver, replayUser = null, chatId, category, meta } = req.body;
+            const { message, receiver, replayUser = null, chatId, category, meta, media } = req.body;
             const { _id } = req.user;
 
             if (!chatId && category === 'new') {
@@ -164,7 +164,8 @@ module.exports = {
                     receiver,
                     message,
                     replayUser,
-                    meta
+                    meta,
+                    media
                 });
                 await newChat.updateOne({ lastMessage: chatMessage.message });
 
@@ -176,9 +177,9 @@ module.exports = {
                     });
                 }
 
-                const messages = await getMessages({ _id });
+                const messages = await getMessages({ _id: receiver });
                 if (messages) {
-                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
+                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${receiver}`, `${KEY_MESSAGE}-event-${receiver}`, {
                         data: messages
                     });
                 }
@@ -205,7 +206,8 @@ module.exports = {
                     receiver,
                     message,
                     replayUser,
-                    meta
+                    meta,
+                    media
                 });
                 await chat.updateOne({ lastMessage: chatMessage.message });
 
@@ -217,9 +219,9 @@ module.exports = {
                     });
                 }
 
-                const messages = await getMessages({ _id });
+                const messages = await getMessages({ _id: receiver });
                 if (messages) {
-                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
+                    pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${receiver}`, `${KEY_MESSAGE}-event-${receiver}`, {
                         data: messages
                     });
                 }
@@ -241,7 +243,8 @@ module.exports = {
                 receiver,
                 message,
                 replayUser,
-                meta
+                meta,
+                media
             });
             await chat.updateOne({ lastMessage: chatMessage.message });
 
@@ -253,9 +256,9 @@ module.exports = {
                 });
             }
 
-            const messages = await getMessages({ _id });
+            const messages = await getMessages({ _id: receiver });
             if (messages) {
-                pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
+                pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${receiver}`, `${KEY_MESSAGE}-event-${receiver}`, {
                     data: messages
                 });
             }
@@ -281,11 +284,9 @@ module.exports = {
             const { chatId } = req.params;
             const data = await chatMessageModel.updateMany({ chat: chatId, statusRead: false }, { statusRead: true });
 
-            console.log(data);
-
             const messages = await getMessages({ _id });
             if (messages) {
-                pusherRealtime.trigger(`${KEY_MESSAGE}-channel`, `${KEY_MESSAGE}-event`, {
+                pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
                     data: messages
                 });
             }

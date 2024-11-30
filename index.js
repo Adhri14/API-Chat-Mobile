@@ -20,7 +20,8 @@ const {
     authRouter,
     userRouter,
     chatRouter,
-    deviceInfoRouter
+    deviceInfoRouter,
+    mediaRouter
 } = require('./app/Routes');
 const testingRouter = require('./app/Routes/testing');
 
@@ -38,6 +39,7 @@ app.use('/', testingRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/upload', mediaRouter);
 app.use('/api/device_info', deviceInfoRouter);
 
 mongoose.set("strictQuery", false);

@@ -13,6 +13,7 @@ const uploadFile = async (filePath) => {
             folder: 'uploads', // Ganti dengan folder yang diinginkan, jika perlu
             use_filename: true, // Menggunakan nama file asli
             unique_filename: false, // Menjaga nama file unik di folder
+            resource_type: "auto",
         });
         return result;
     } catch (error) {
