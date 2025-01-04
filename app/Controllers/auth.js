@@ -4,6 +4,7 @@ const otpModel = require("../Models/otp");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sendNotification = require("../Utils/sendNotification");
+const sendEmailOTP = require("../Utils/sendEmailOTP");
 
 const response = { status: 200, message: '' };
 const baseTime = new Date();
@@ -40,18 +41,17 @@ module.exports = {
             const otp = generateOtp(6);
             const otpResult = await otpModel.create({ otp, expiredAt, email: user.email, userId: user._id });
 
-            // const bodyEmail = {
-            //     name: user.fullName,
-            //     otp: otpResult
-            // }
-            // await sendEmailOTP(user.email, "Verification Email", "otp", bodyEmail);
+            const bodyEmail = {
+                otp: otpResult
+            }
+            sendEmailOTP(user.email, "Verification Email", "otp", bodyEmail);
 
-            const payload = {
-                title: 'Econify Notification',
-                body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
-                data: {},
-            };
-            sendNotification(user.deviceToken, payload);
+            // const payload = {
+            //     title: 'Econify Notification',
+            //     body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
+            //     data: {},
+            // };
+            // sendNotification(user.deviceToken, payload);
 
             response.status = 201;
             response.message = 'Sign up has been successfully!. Please Login';
@@ -132,12 +132,17 @@ module.exports = {
             const otp = generateOtp(6);
             const otpResult = await otpModel.create({ otp, expiredAt, email: user.email, userId: user._id });
 
-            const payload = {
-                title: 'Econify Notification',
-                body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
-                data: {},
-            };
-            sendNotification(user.deviceToken, payload);
+            const bodyEmail = {
+                otp: otpResult
+            }
+            sendEmailOTP(user.email, "Verification Email", "otp", bodyEmail);
+
+            // const payload = {
+            //     title: 'Econify Notification',
+            //     body: `Kode verifikasi Econify anda adalah: ${otpResult.otp}`,
+            //     data: {},
+            // };
+            // sendNotification(user.deviceToken, payload);
 
             response.status = 201;
             response.message = 'OTP has been send in email!';

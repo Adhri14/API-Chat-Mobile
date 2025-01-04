@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OTP Gemasting</title>
-    <link rel="shortcut icon" href="https://api.gemasting.com/storage/app/public/assets/photo/profile/icon.png">
+    <title>OTP Econify</title>
+    <link rel="shortcut icon" href="https://res.cloudinary.com/dfvtzc7kr/image/upload/v1735963587/xlh8rrqhiklhwpls6q8f.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
       
@@ -12,10 +12,24 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        #otp-box img {
+        #otp-box .wrapper-logo .logo-box img {
             display: block;
-            margin: 0 auto 5%;
+            /* margin: 0 auto; */
+            width: 100px;
+        }
 
+        #otp-box .wrapper-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #otp-box .wrapper-logo .logo-box {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 5%;
         }
 
         .otp-content {
@@ -24,7 +38,7 @@
 
 
         .text-primary {
-            color: #EC4794;
+            color: #3461FD;
         }
 
         .text-gray {
@@ -53,10 +67,14 @@
 </head>
 <body>
     <section id="otp-box">
-        <img src="https://api.gemasting.com/storage/app/public/assets/photo/profile/logo.png" >
         <div class="otp-content">
+            <div class="wrapper-logo">
+                <div class="logo-box">
+                    <img src="https://res.cloudinary.com/dfvtzc7kr/image/upload/v1735963587/xlh8rrqhiklhwpls6q8f.png">
+                    <p class="text-primary" style="font-size: 24px;"><strong>Econify</strong></p>
+                </div>
+            </div>
             <h2 class="mb-2">Kode Verifikasi</h2>
-            {{-- <h1 class="text-primary otp">2&nbsp;&nbsp;2&nbsp;&nbsp;3&nbsp;&nbsp;3</h1> --}}
             <h1 class="text-primary otp"><%= otp %></h1>
             <p>Segera lakukan verifikasi karena kode akan <br> kadaluarsa dalam 30 detik.</p>
             <p class="text-primary">Jangan bagikan kode ini <br>
@@ -64,7 +82,7 @@
         </div>
         <div class="line"></div>
         <div class="otp-footer text-gray">
-           <p>Dikirim oleh Adhri IT Tech</p>
+           <p>Dikirim oleh Econify IT Tech</p>
            <p>Mohon untuk tidak dibalas karena email ini <br>
             dikirim oleh komputer</p>
             <p class="text-primary">Bantuan - Kebijakan Privasi</p>

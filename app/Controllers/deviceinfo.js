@@ -1,4 +1,6 @@
 const deviceInfoModel = require("../Models/deviceInfo");
+const generateOtp = require("../Utils/generateOtp");
+const sendEmailOTP = require("../Utils/sendEmailOTP");
 
 module.exports = {
     register: async (req, res) => {
@@ -27,5 +29,20 @@ module.exports = {
                 message: error.message || 'Internal server error!',
             });
         }
-    }
+    },
+    // testEmail: async (req, res) => {
+    //     try {
+    //         const otp = generateOtp(6);
+    //         sendEmailOTP('adhri.adly@gmail.com', 'Testing Email', 'otp', { otp });
+    //         return res.status(200).json({
+    //             status: 200,
+    //             message: 'Send Email Success!'
+    //         })
+    //     } catch (error) {
+    //         return res.status(500).json({
+    //             status: 500,
+    //             message: error.message || 'Internal server error!',
+    //         });
+    //     }
+    // }
 }

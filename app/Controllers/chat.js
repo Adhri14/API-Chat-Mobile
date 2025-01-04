@@ -8,8 +8,15 @@ const KEY_MESSAGE = "conversation-messages-";
 const getMessage = async (data) => {
     try {
         const chats = await chatMessageModel.findOne({ _id: data._id })
-            .populate('sender', '_id fullName image')
-            .populate('receiver', '_id fullName image');
+            .populate('sender')
+            .populate('receiver')
+            .populate({
+                path: 'replyMessage',
+                populate: [
+                    { path: 'sender', model: 'User' }, // Populate sender dari replyMessage
+                    { path: 'receiver', model: 'User' } // Populate receiver dari replyMessage
+                ]
+            });
 
         return chats;
     } catch (error) {
@@ -60,7 +67,7 @@ module.exports = {
             const chats2 = await chatModel.find({ participants: _id });
 
             const newChats = await Promise.all(chats.map(async (chat) => {
-                const messages = await chatMessageModel.find({ statusRead: false, chat: chat._id });
+                const messages = await chatMessageModel.find({ statusRead: false, chat: chat._id, receiver: _id });
                 return {
                     ...chat.toObject(),
                     totalStatusChatUnRead: messages.length,
@@ -101,8 +108,15 @@ module.exports = {
 
                 if (chat) {
                     chats = await chatMessageModel.find({ chat: chat._id })
-                        .populate('sender', '_id fullName image')
-                        .populate('receiver', '_id fullName image')
+                        .populate('sender')
+                        .populate('receiver')
+                        .populate({
+                            path: 'replyMessage',
+                            populate: [
+                                { path: 'sender', model: 'User' }, // Populate sender dari replyMessage
+                                { path: 'receiver', model: 'User' } // Populate receiver dari replyMessage
+                            ]
+                        })
                         .sort({ createdAt: -1 })
                         .limit(limit)
                         .skip(page * limit);
@@ -122,8 +136,15 @@ module.exports = {
             }
 
             chats = await chatMessageModel.find({ chat: chatId })
-                .populate('sender', '_id fullName image')
-                .populate('receiver', '_id fullName image')
+                .populate('sender')
+                .populate('receiver')
+                .populate({
+                    path: 'replyMessage',
+                    populate: [
+                        { path: 'sender', model: 'User' }, // Populate sender dari replyMessage
+                        { path: 'receiver', model: 'User' } // Populate receiver dari replyMessage
+                    ]
+                })
                 .sort({ createdAt: -1 })
                 .limit(limit)
                 .skip(page * limit);
@@ -149,7 +170,7 @@ module.exports = {
     },
     sendChat: async (req, res) => {
         try {
-            const { message, receiver, replayUser = null, chatId, category, meta, media } = req.body;
+            const { message, receiver, replyMessage, chatId, category, meta, media } = req.body;
             const { _id } = req.user;
 
             if (!chatId && category === 'new') {
@@ -163,7 +184,7 @@ module.exports = {
                     sender: _id,
                     receiver,
                     message,
-                    replayUser,
+                    replyMessage,
                     meta,
                     media
                 });
@@ -205,7 +226,7 @@ module.exports = {
                     sender: _id,
                     receiver,
                     message,
-                    replayUser,
+                    replyMessage,
                     meta,
                     media
                 });
@@ -242,7 +263,7 @@ module.exports = {
                 sender: _id,
                 receiver,
                 message,
-                replayUser,
+                replyMessage,
                 meta,
                 media
             });
@@ -282,17 +303,18 @@ module.exports = {
         try {
             const { _id } = req.user;
             const { chatId } = req.params;
-            const data = await chatMessageModel.updateMany({ chat: chatId, statusRead: false }, { statusRead: true });
-
-            const messages = await getMessages({ _id });
+            const chatMessage = await chatMessageModel.findOne({ chat: chatId }).sort({ createdAt: -1 });
+            const data = await chatMessageModel.updateMany({ chat: chatId, statusRead: false, receiver: chatMessage.receiver }, { statusRead: true });
+            const messages = await getMessages({ _id: chatMessage.receiver });
             if (messages) {
                 pusherRealtime.trigger(`${KEY_MESSAGE}-channel-${_id}`, `${KEY_MESSAGE}-event-${_id}`, {
                     data: messages
                 });
             }
 
+            const chats = await getMessage({ "_id": chatId });
             pusherRealtime.trigger(`${KEY_CHAT}-channel-${chatId}`, `${KEY_CHAT}-event-${chatId}`, {
-                data: null
+                data: chats
             });
 
             return res.status(200).json({

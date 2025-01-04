@@ -26,7 +26,8 @@ const {
 } = require('./chat');
 
 const {
-    register: registerDevice
+    register: registerDevice,
+    // testEmail
 } = require("./deviceinfo");
 
 const {
@@ -54,4 +55,5 @@ module.exports = {
     unfollowProfile,
     registerDevice,
     uploadMedia,
+    // testEmail
 }

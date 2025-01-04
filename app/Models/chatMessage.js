@@ -20,9 +20,9 @@ const ChatMessageSchema = new Schema({
         ref: 'User',
         required: true
     },
-    replayUser: {
+    replyMessage: {
         type: Schema.Types.ObjectId,
-        ref: 'Chat',
+        ref: 'ChatMessage',
         default: null,
     },
     statusRead: {
