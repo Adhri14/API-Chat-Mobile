@@ -27,7 +27,7 @@ const {
 
 const {
     register: registerDevice,
-    // testEmail
+    testEmail
 } = require("./deviceinfo");
 
 const {
@@ -55,5 +55,5 @@ module.exports = {
     unfollowProfile,
     registerDevice,
     uploadMedia,
-    // testEmail
+    testEmail
 }
