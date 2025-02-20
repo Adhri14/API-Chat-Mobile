@@ -9,11 +9,16 @@ Cloudinary.config({
 
 const uploadFile = async (filePath) => {
     try {
+
         const result = await Cloudinary.uploader.upload(filePath, {
-            folder: 'uploads', // Ganti dengan folder yang diinginkan, jika perlu
+            folder: 'videos', // Ganti dengan folder yang diinginkan, jika perlu
             use_filename: true, // Menggunakan nama file asli
             unique_filename: false, // Menjaga nama file unik di folder
             resource_type: "auto",
+            transformation: {
+                quality: 50,
+                fps: 30,
+            }
         });
         return result;
     } catch (error) {

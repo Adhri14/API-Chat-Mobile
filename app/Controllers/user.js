@@ -177,7 +177,7 @@ module.exports = {
     getProfileById: async (req, res) => {
         try {
             const { userId } = req.params;
-            const user = await userModel.findOne({ _id: userId });
+            const user = await userModel.findOne({ _id: userId }).populate('following').populate('followers');
 
             if (!user) {
                 return res.status(404).json({

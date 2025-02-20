@@ -4,13 +4,12 @@ const uploadFile = require("../Utils/uploadFileCloudinary");
 module.exports = {
     uploadMedia: async (req, res) => {
         try {
-            const { _id } = req.user;
-            console.log('cek data : ', req.file);
+            // const { _id } = req.user;
             if (req.file) {
                 const temp_path = req.file.path;
                 const result = await uploadFile(temp_path);
                 const resultUpload = {
-                    userId: _id,
+                    userId: null,
                     width: result.width,
                     height: result.height,
                     format: result.format,

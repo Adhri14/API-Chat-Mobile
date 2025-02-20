@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sendNotification = require("../Utils/sendNotification");
 const sendEmailOTP = require("../Utils/sendEmailOTP");
+const { validationResult } = require("express-validator");
+const formateValidationError = require("../Utils/formatValidationErrors");
 
 const response = { status: 200, message: '' };
 const baseTime = new Date();
@@ -14,15 +16,23 @@ module.exports = {
     signUp: async (req, res) => {
         try {
             const { fullName, username, email, password, deviceToken } = req.body;
-            console.log('cek body : ', req.body);
 
-            if (!fullName || !username || !email || !password || !deviceToken) {
-                console.log('masuk sini kah?');
-                return res.status(400).json({
-                    status: 400,
-                    message: 'Bad request'
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({
+                    status: 422,
+                    message: 'Validation Error',
+                    errors: formateValidationError(errors.array()),
                 });
             }
+
+            // if (!fullName || !username || !email || !password || !deviceToken) {
+            //     console.log('masuk sini kah?');
+            //     return res.status(400).json({
+            //         status: 400,
+            //         message: 'Bad request'
+            //     });
+            // }
 
             const checkUserExist = await userModel.findOne({ email });
 
@@ -161,6 +171,8 @@ module.exports = {
     signIn: async (req, res) => {
         try {
             const { email, password, deviceToken } = req.body;
+
+            const errors = validationResult(req);
 
             const user = await userModel.findOne({ $or: [{ email }, { username: email }] });
             console.log('cek : ', user);

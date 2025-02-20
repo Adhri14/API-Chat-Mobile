@@ -5,6 +5,6 @@ const { uploadMedia } = require('../Controllers');
 
 const router = require('express').Router();
 
-router.post('/', [authMiddleware, multer({ dest: os.tmpdir() }).single('file')], uploadMedia);
+router.post('/', [multer({ dest: os.tmpdir() }).single('file')], uploadMedia);
 
 module.exports = router;
